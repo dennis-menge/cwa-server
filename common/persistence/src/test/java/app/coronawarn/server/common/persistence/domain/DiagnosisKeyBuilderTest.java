@@ -38,7 +38,6 @@ class DiagnosisKeyBuilderTest {
 
   private final byte[] expKeyData = "16-bytelongarray".getBytes(Charset.defaultCharset());
   private final long expRollingStartNumber = 73800;
-  private final long expRollingPeriod = 144;
   private final int expTransmissionRiskLevel = 1;
   private final long expSubmissionTimestamp = 2L;
 
@@ -48,7 +47,7 @@ class DiagnosisKeyBuilderTest {
         .newBuilder()
         .setKeyData(ByteString.copyFrom(this.expKeyData))
         .setRollingStartIntervalNumber(Long.valueOf(this.expRollingStartNumber).intValue())
-        .setRollingPeriod(Long.valueOf(this.expRollingPeriod).intValue())
+        .setRollingPeriod(DiagnosisKey.EXPECTED_ROLLING_PERIOD)
         .setTransmissionRiskLevel(this.expTransmissionRiskLevel)
         .build();
 
@@ -66,7 +65,7 @@ class DiagnosisKeyBuilderTest {
         .newBuilder()
         .setKeyData(ByteString.copyFrom(this.expKeyData))
         .setRollingStartIntervalNumber(Long.valueOf(this.expRollingStartNumber).intValue())
-        .setRollingPeriod(Long.valueOf(this.expRollingPeriod).intValue())
+        .setRollingPeriod(DiagnosisKey.EXPECTED_ROLLING_PERIOD)
         .setTransmissionRiskLevel(this.expTransmissionRiskLevel)
         .build();
 
@@ -80,7 +79,6 @@ class DiagnosisKeyBuilderTest {
     DiagnosisKey actDiagnosisKey = DiagnosisKey.builder()
         .withKeyData(this.expKeyData)
         .withRollingStartNumber(this.expRollingStartNumber)
-        .withRollingPeriod(this.expRollingPeriod)
         .withTransmissionRiskLevel(this.expTransmissionRiskLevel)
         .withSubmissionTimestamp(this.expSubmissionTimestamp).build();
 
@@ -92,10 +90,21 @@ class DiagnosisKeyBuilderTest {
     DiagnosisKey actDiagnosisKey = DiagnosisKey.builder()
         .withKeyData(this.expKeyData)
         .withRollingStartNumber(this.expRollingStartNumber)
-        .withRollingPeriod(this.expRollingPeriod)
         .withTransmissionRiskLevel(this.expTransmissionRiskLevel).build();
 
     assertDiagnosisKeyEquals(actDiagnosisKey);
+  }
+
+  @Test
+  void buildSuccessivelyWithRollingPeriod() {
+    DiagnosisKey actDiagnosisKey = DiagnosisKey.builder()
+        .withKeyData(this.expKeyData)
+        .withRollingStartNumber(this.expRollingStartNumber)
+        .withTransmissionRiskLevel(this.expTransmissionRiskLevel)
+        .withSubmissionTimestamp(this.expSubmissionTimestamp)
+        .withRollingPeriod(DiagnosisKey.EXPECTED_ROLLING_PERIOD).build();
+
+    assertDiagnosisKeyEquals(actDiagnosisKey, this.expSubmissionTimestamp);
   }
 
   @Test
@@ -134,7 +143,6 @@ class DiagnosisKeyBuilderTest {
         catchThrowable(() -> DiagnosisKey.builder()
             .withKeyData(this.expKeyData)
             .withRollingStartNumber(0L)
-            .withRollingPeriod(this.expRollingPeriod)
             .withTransmissionRiskLevel(this.expTransmissionRiskLevel).build()
         )
     ).isInstanceOf(InvalidDiagnosisKeyException.class);
@@ -156,17 +164,19 @@ class DiagnosisKeyBuilderTest {
   }
 
   @ParameterizedTest
-  @ValueSource(longs = {0L, -3L})
-  void rollingPeriodMustBeLargerThanZero(long invalidRollingPeriod) {
+  @ValueSource(longs = {-3L, 143, 145})
+  void rollingPeriodMustBeEpectedValue(long invalidRollingPeriod) {
     assertThat(catchThrowable(() -> keyWithRollingPeriod(invalidRollingPeriod)))
         .isInstanceOf(InvalidDiagnosisKeyException.class)
-        .hasMessage(
-            "[Rolling period must be greater than 0. Invalid Value: " + invalidRollingPeriod + "]");
+        .hasMessage("[Rolling period must be "
+            + DiagnosisKey.EXPECTED_ROLLING_PERIOD
+            + ". Invalid Value: "
+            + invalidRollingPeriod + "]");
   }
 
   @Test
   void rollingPeriodDoesNotThrowForValid() {
-    assertThatCode(() -> keyWithRollingPeriod(144L)).doesNotThrowAnyException();
+    assertThatCode(() -> keyWithRollingPeriod(DiagnosisKey.EXPECTED_ROLLING_PERIOD)).doesNotThrowAnyException();
   }
 
   @ParameterizedTest
@@ -187,7 +197,6 @@ class DiagnosisKeyBuilderTest {
     return DiagnosisKey.builder()
         .withKeyData(expKeyData)
         .withRollingStartNumber(expRollingStartNumber)
-        .withRollingPeriod(expRollingPeriod)
         .withTransmissionRiskLevel(expTransmissionRiskLevel).build();
   }
 
@@ -195,7 +204,6 @@ class DiagnosisKeyBuilderTest {
     return DiagnosisKey.builder()
         .withKeyData(expKeyData)
         .withRollingStartNumber(expRollingStartNumber)
-        .withRollingPeriod(expRollingPeriod)
         .withTransmissionRiskLevel(expTransmissionRiskLevel).build();
   }
 
@@ -203,15 +211,14 @@ class DiagnosisKeyBuilderTest {
     return DiagnosisKey.builder()
         .withKeyData(expKeyData)
         .withRollingStartNumber(expRollingStartNumber)
-        .withRollingPeriod(expRollingPeriod)
-        .withTransmissionRiskLevel(expTransmissionRiskLevel).build();
+        .withTransmissionRiskLevel(expTransmissionRiskLevel)
+        .withRollingPeriod(expRollingPeriod).build();
   }
 
   private DiagnosisKey keyWithRiskLevel(int expTransmissionRiskLevel) {
     return DiagnosisKey.builder()
         .withKeyData(expKeyData)
         .withRollingStartNumber(expRollingStartNumber)
-        .withRollingPeriod(expRollingPeriod)
         .withTransmissionRiskLevel(expTransmissionRiskLevel).build();
   }
 
@@ -227,7 +234,7 @@ class DiagnosisKeyBuilderTest {
     assertThat(actDiagnosisKey.getSubmissionTimestamp()).isEqualTo(expSubmissionTimestamp);
     assertThat(actDiagnosisKey.getKeyData()).isEqualTo(this.expKeyData);
     assertThat(actDiagnosisKey.getRollingStartNumber()).isEqualTo(this.expRollingStartNumber);
-    assertThat(actDiagnosisKey.getRollingPeriod()).isEqualTo(this.expRollingPeriod);
+    assertThat(actDiagnosisKey.getRollingPeriod()).isEqualTo(DiagnosisKey.EXPECTED_ROLLING_PERIOD);
     assertThat(actDiagnosisKey.getTransmissionRiskLevel()).isEqualTo(this.expTransmissionRiskLevel);
   }
 }

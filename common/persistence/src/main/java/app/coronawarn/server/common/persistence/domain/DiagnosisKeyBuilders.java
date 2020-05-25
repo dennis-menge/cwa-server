@@ -54,19 +54,7 @@ interface DiagnosisKeyBuilders {
      *                           startTimeOfKeySinceEpochInSecs / (60 * 10).
      * @return this Builder instance.
      */
-    RollingPeriodBuilder withRollingStartNumber(long rollingStartNumber);
-  }
-
-  interface RollingPeriodBuilder {
-
-    /**
-     * Adds the specified rolling period to this builder.
-     *
-     * @param rollingPeriod Number describing how long a key is valid. It is expressed in increments
-     *                      of 10 minutes (e.g. 144 for 24 hours).
-     * @return this Builder instance.
-     */
-    TransmissionRiskLevelBuilder withRollingPeriod(long rollingPeriod);
+    TransmissionRiskLevelBuilder withRollingStartNumber(long rollingStartNumber);
   }
 
   interface TransmissionRiskLevelBuilder {
@@ -89,6 +77,16 @@ interface DiagnosisKeyBuilders {
      * @return this Builder instance.
      */
     FinalBuilder withSubmissionTimestamp(long submissionTimestamp);
+
+    /**
+     * Adds the specified rolling period to this builder. If not specified, the rolling period defaults to {@link
+     * DiagnosisKey#EXPECTED_ROLLING_PERIOD}
+     *
+     * @param rollingPeriod Number describing how long a key is valid. It is expressed in increments of 10 minutes (e.g.
+     *                      144 for 24 hours).
+     * @return this Builder instance.
+     */
+    FinalBuilder withRollingPeriod(long rollingPeriod);
 
     /**
      * Builds a {@link DiagnosisKey} instance. If no submission timestamp has been specified it will be set to "now" as

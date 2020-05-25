@@ -137,7 +137,6 @@ class DiagnosisKeyServiceTest {
       var keys = List.of(DiagnosisKey.builder()
           .withKeyData(new byte[16])
           .withRollingStartNumber(OffsetDateTime.now(UTC).toEpochSecond() / 600L)
-          .withRollingPeriod(1L)
           .withTransmissionRiskLevel(2)
           .withSubmissionTimestamp(0L).build());
 
@@ -153,7 +152,6 @@ class DiagnosisKeyServiceTest {
     return DiagnosisKey.builder()
         .withKeyData(new byte[16])
         .withRollingStartNumber(600L)
-        .withRollingPeriod(1L)
         .withTransmissionRiskLevel(2)
         .withSubmissionTimestamp(submissionTimeStamp).build();
   }

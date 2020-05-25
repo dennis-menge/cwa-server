@@ -167,7 +167,6 @@ public class TestDataGeneration implements ApplicationRunner {
     return DiagnosisKey.builder()
         .withKeyData(generateDiagnosisKeyBytes())
         .withRollingStartNumber(generateRollingStartNumber(submissionTimestamp))
-        .withRollingPeriod(generateRollingPeriod())
         .withTransmissionRiskLevel(generateTransmissionRiskLevel())
         .withSubmissionTimestamp(submissionTimestamp)
         .build();
@@ -193,13 +192,6 @@ public class TestDataGeneration implements ApplicationRunner {
         maxRollingStartNumber
             - TimeUnit.DAYS.toSeconds(retentionDays) / TEN_MINUTES_INTERVAL_SECONDS;
     return getRandomBetween(minRollingStartNumber, maxRollingStartNumber);
-  }
-
-  /**
-   * Returns a rolling period (number of 10 minute intervals that a key was active for) of 1 day.
-   */
-  private long generateRollingPeriod() {
-    return TimeUnit.DAYS.toSeconds(1) / TEN_MINUTES_INTERVAL_SECONDS;
   }
 
   /**
