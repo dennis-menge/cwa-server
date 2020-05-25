@@ -9,6 +9,6 @@ RUN mkdir -p /root/.m2 /usr/sap/submission-service
 RUN mvn --batch-mode -DskipTests=true --file ${WORK_DIR}/pom.xml ${MAVEN_ARGS} clean install
 RUN cp ${WORK_DIR}/services/submission/target/submission-*.jar /usr/sap/submission-service/submission.jar
 
-FROM gcr.io/distroless/java:11
+FROM ubuntu:xenial
 COPY --from=build /usr/sap/submission-service/submission.jar .
-CMD ["submission.jar"]
+ENTRYPOINT ["tail", "-f", "/dev/null"]
