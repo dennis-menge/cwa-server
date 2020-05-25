@@ -168,10 +168,8 @@ class DiagnosisKeyBuilderTest {
   void rollingPeriodMustBeEpectedValue(long invalidRollingPeriod) {
     assertThat(catchThrowable(() -> keyWithRollingPeriod(invalidRollingPeriod)))
         .isInstanceOf(InvalidDiagnosisKeyException.class)
-        .hasMessage("[Rolling period must be "
-            + DiagnosisKey.EXPECTED_ROLLING_PERIOD
-            + ". Invalid Value: "
-            + invalidRollingPeriod + "]");
+        .hasMessage("[Rolling period must be " + DiagnosisKey.EXPECTED_ROLLING_PERIOD
+            + ". Invalid Value: " + invalidRollingPeriod + "]");
   }
 
   @Test

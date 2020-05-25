@@ -19,6 +19,9 @@
 
 package app.coronawarn.server.services.submission.controller;
 
+import static app.coronawarn.server.services.submission.controller.RequestExecutor.VALID_KEY_DATA_1;
+import static app.coronawarn.server.services.submission.controller.RequestExecutor.VALID_KEY_DATA_2;
+import static app.coronawarn.server.services.submission.controller.RequestExecutor.VALID_KEY_DATA_3;
 import static app.coronawarn.server.services.submission.controller.RequestExecutor.buildOkHeaders;
 import static app.coronawarn.server.services.submission.controller.RequestExecutor.buildTemporaryExposureKey;
 import static app.coronawarn.server.services.submission.controller.RequestExecutor.createRollingStartNumber;
@@ -203,14 +206,14 @@ class SubmissionControllerTest {
   }
 
   private static Collection<TemporaryExposureKey> buildPayloadWithOneKey() {
-    return Collections.singleton(buildTemporaryExposureKey("testKey111111111", 1, 3));
+    return Collections.singleton(buildTemporaryExposureKey(VALID_KEY_DATA_1, 1, 3));
   }
 
   private static Collection<TemporaryExposureKey> buildPayloadWithMultipleKeys() {
     return Stream.of(
-        buildTemporaryExposureKey("testKey111111111", createRollingStartNumber(2), 3),
-        buildTemporaryExposureKey("testKey222222222", createRollingStartNumber(4), 6),
-        buildTemporaryExposureKey("testKey333333333", createRollingStartNumber(10), 8))
+        buildTemporaryExposureKey(VALID_KEY_DATA_1, createRollingStartNumber(2), 3),
+        buildTemporaryExposureKey(VALID_KEY_DATA_2, createRollingStartNumber(4), 6),
+        buildTemporaryExposureKey(VALID_KEY_DATA_3, createRollingStartNumber(10), 8))
         .collect(Collectors.toCollection(ArrayList::new));
   }
 
@@ -221,7 +224,7 @@ class SubmissionControllerTest {
 
   private static TemporaryExposureKey createOutdatedKey() {
     return TemporaryExposureKey.newBuilder()
-        .setKeyData(ByteString.copyFromUtf8("testKey222222222"))
+        .setKeyData(ByteString.copyFromUtf8(VALID_KEY_DATA_2))
         .setRollingStartIntervalNumber(createRollingStartNumber(99))
         .setRollingPeriod(DiagnosisKey.EXPECTED_ROLLING_PERIOD)
         .setTransmissionRiskLevel(5).build();
@@ -229,7 +232,7 @@ class SubmissionControllerTest {
 
   private static Collection<TemporaryExposureKey> buildPayloadWithInvalidKey() {
     return Stream.of(
-        buildTemporaryExposureKey("testKey111111111", createRollingStartNumber(2), 999))
+        buildTemporaryExposureKey(VALID_KEY_DATA_1, createRollingStartNumber(2), 999))
         .collect(Collectors.toCollection(ArrayList::new));
   }
 
